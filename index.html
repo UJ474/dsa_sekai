@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DSA Vision – Algorithm Visualizer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#57a5ff",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0f1823",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .sidebar-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- Sidebar Overlay -->
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-300" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<!-- Sliding Sidebar -->
+<aside class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-[70] -translate-x-full sidebar-transition flex flex-col" id="sidebar">
+<div class="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" id="sidebar-title-icon">category</span>
+<h2 class="font-bold text-lg tracking-tight" id="sidebar-title">Topics</h2>
+</div>
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md text-slate-500" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+<!-- Topics Content (Default) -->
+<div class="space-y-6" id="sidebar-content-topics">
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Sorting</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-lg">bar_chart</span>
+                        Bubble Sort
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">align_horizontal_left</span>
+                        Quick Sort
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">merge</span>
+                        Merge Sort
+                    </a>
+</div>
+</div>
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Searching</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">search</span>
+                        Binary Search
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">travel_explore</span>
+                        DFS &amp; BFS
+                    </a>
+</div>
+</div>
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Graphs</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">account_tree</span>
+                        Dijkstra's
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">hub</span>
+                        Prim's Algorithm
+                    </a>
+</div>
+</div>
+</div>
+<!-- Library Content (Hidden by default) -->
+<div class="hidden space-y-6" id="sidebar-content-library">
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Saved Visuals</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+                        Complex Binary Tree
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+                        Custom Graph Data
+                    </a>
+</div>
+</div>
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Documentation</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">description</span>
+                        Big O Notation Guide
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-lg">menu_book</span>
+                        Complexity Cheat Sheet
+                    </a>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+<button class="w-full flex items-center justify-center gap-2 py-2 text-xs font-bold text-primary bg-primary/10 rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+            Create New Viz
+        </button>
+</div>
+</aside>
+<!-- Navigation Bar -->
+<header class="w-full border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark sticky top-0 z-50">
+<div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="text-primary">
+<span class="material-symbols-outlined text-3xl">query_stats</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DSA <span class="text-primary">Vision</span></h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<button class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors flex items-center gap-1" onclick="openSidebar('topics')">
+                    Topics
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors flex items-center gap-1" onclick="openSidebar('library')">
+                    Library
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">explore</span>
+                Explore
+            </button>
+<div class="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
+<button class="text-sm font-medium text-slate-600 dark:text-slate-300 px-4 py-2 hover:text-primary">Login</button>
+<button class="bg-primary text-background-dark text-sm font-bold px-5 py-2 rounded-lg hover:bg-primary/90 transition-all">Sign Up</button>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 max-w-[1600px] mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-10 gap-6">
+<!-- Left Column: Visualizer & Pseudocode (60%) -->
+<div class="lg:col-span-6 flex flex-col gap-6">
+<!-- Algorithm Visualizer Panel -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg">Bubble Sort</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Learn Algorithms Through Visualization</p>
+</div>
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20 uppercase tracking-wider">Sorting</span>
+</div>
+<!-- Visualization Canvas -->
+<div class="aspect-video w-full bg-slate-50 dark:bg-[#0c121a] relative flex items-end justify-center gap-1 p-8">
+<!-- Vertical Bars (Gradient Blue to Purple) -->
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 40%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 65%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm border-2 border-yellow-400" data-alt="Active vertical bar highlighted with yellow border" style="height: 85%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm border-2 border-yellow-400" data-alt="Active vertical bar highlighted with yellow border" style="height: 35%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 50%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 90%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 25%"></div>
+<div class="w-8 bg-gradient-to-t from-primary to-purple-500 rounded-t-sm" data-alt="Vertical gradient bar representing data value" style="height: 75%"></div>
+</div>
+<!-- Control Bar -->
+<div class="p-4 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">skip_previous</span>
+</button>
+<button class="p-3 bg-primary text-background-dark rounded-full hover:bg-primary/90 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">skip_next</span>
+</button>
+<button class="p-2 ml-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">replay</span>
+</button>
+</div>
+<div class="flex items-center gap-4 min-w-[200px]">
+<span class="text-xs font-medium text-slate-500 uppercase tracking-tight">Speed</span>
+<div class="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full relative">
+<div class="absolute inset-y-0 left-0 w-[65%] bg-primary rounded-full"></div>
+<div class="absolute top-1/2 left-[65%] -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-slate-100 rounded-full border-2 border-primary cursor-pointer shadow-sm"></div>
+</div>
+<span class="text-xs font-mono text-slate-500">1.5x</span>
+</div>
+</div>
+</div>
+<!-- Pseudocode Panel -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+<div class="px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Pseudocode</span>
+<span class="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">Step 14/42</span>
+</div>
+<div class="p-4 font-mono text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">1</span><span>procedure bubbleSort(A : list of sortable items)</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">2</span><span class="pl-4">n := length(A)</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">3</span><span class="pl-4">repeat</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">4</span><span class="pl-8">swapped := false</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">5</span><span class="pl-8">for i := 1 to n-1 inclusive do</span></div>
+<div class="flex gap-4 bg-primary/20 border-l-4 border-primary -mx-4 px-4 py-0.5"><span class="w-4 text-right text-primary">6</span><span class="pl-12">if A[i-1] &gt; A[i] then</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">7</span><span class="pl-16">swap(A[i-1], A[i])</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">8</span><span class="pl-16">swapped := true</span></div>
+<div class="flex gap-4 opacity-50"><span class="w-4 text-right">9</span><span class="pl-4">until not swapped</span></div>
+</div>
+</div>
+</div>
+<!-- Right Column: Editor & Console (40%) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Code Editor Panel -->
+<div class="bg-[#1e1e1e] border border-slate-800 rounded-xl overflow-hidden flex flex-col h-[500px]">
+<div class="h-10 bg-[#252526] flex items-center justify-between px-4 border-b border-[#333]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary">code</span>
+<span class="text-xs text-slate-300 font-medium">bubble_sort.py</span>
+</div>
+<select class="bg-[#1e1e1e] text-[11px] text-slate-300 border-none focus:ring-0 py-0.5 px-2 rounded cursor-pointer">
+<option>Python</option>
+<option>C++</option>
+<option>Java</option>
+</select>
+</div>
+<div class="flex-1 p-4 font-mono text-sm overflow-auto">
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">1</span>
+<span class="text-[#c586c0]">def</span> <span class="text-[#dcdcaa]">bubble_sort</span><span class="text-[#ffd700]">(</span><span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">)</span>:
+                </div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">2</span>
+<span class="pl-4 text-[#9cdcfe]">n</span> = <span class="text-[#dcdcaa]">len</span><span class="text-[#ffd700]">(</span><span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">)</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">3</span>
+<span class="pl-4 text-[#c586c0]">for</span> <span class="text-[#9cdcfe]">i</span> <span class="text-[#c586c0]">in</span> <span class="text-[#dcdcaa]">range</span><span class="text-[#ffd700]">(</span><span class="text-[#9cdcfe]">n</span><span class="text-[#ffd700]">)</span>:
+                </div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">4</span>
+<span class="pl-8 text-[#c586c0]">for</span> <span class="text-[#9cdcfe]">j</span> <span class="text-[#c586c0]">in</span> <span class="text-[#dcdcaa]">range</span><span class="text-[#ffd700]">(</span><span class="text-white">0</span>, <span class="text-[#9cdcfe]">n</span>-<span class="text-[#9cdcfe]">i</span>-<span class="text-white">1</span><span class="text-[#ffd700]">)</span>:
+                </div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">5</span>
+<span class="pl-12 text-[#c586c0]">if</span> <span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span><span class="text-[#ffd700]">]</span> &gt; <span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span>+<span class="text-white">1</span><span class="text-[#ffd700]">]</span>:
+                </div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">6</span>
+<span class="pl-16 text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span><span class="text-[#ffd700]">]</span>, <span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span>+<span class="text-white">1</span><span class="text-[#ffd700]">]</span> = <span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span>+<span class="text-white">1</span><span class="text-[#ffd700]">]</span>, <span class="text-[#9cdcfe]">arr</span><span class="text-[#ffd700]">[</span><span class="text-[#9cdcfe]">j</span><span class="text-[#ffd700]">]</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 text-right w-6 select-none">7</span>
+<span class="pl-4 text-[#c586c0]">return</span> <span class="text-[#9cdcfe]">arr</span>
+</div>
+</div>
+<div class="p-3 bg-[#252526] border-t border-[#333] flex justify-end">
+<button class="bg-primary text-background-dark text-xs font-bold px-4 py-1.5 rounded flex items-center gap-2 hover:bg-primary/90">
+<span class="material-symbols-outlined text-[16px]">play_circle</span>
+                    Run Code
+                </button>
+</div>
+</div>
+<!-- Test Case & Output Panel -->
+<div class="grid grid-cols-2 gap-4 flex-1">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm">
+<div class="px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Input</span>
+<span class="material-symbols-outlined text-xs text-slate-400 cursor-pointer">edit</span>
+</div>
+<div class="p-3 flex-1">
+<textarea class="w-full h-full bg-transparent border-none focus:ring-0 font-mono text-sm resize-none text-slate-700 dark:text-slate-300">[5, 3, 8, 2, 1]</textarea>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-sm">
+<div class="px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Output</span>
+<span class="material-symbols-outlined text-xs text-green-500">check_circle</span>
+</div>
+<div class="p-3 flex-1 font-mono text-sm text-slate-600 dark:text-slate-400">
+<p class="text-slate-400 mb-1">Result:</p>
+<p class="text-primary font-bold">[1, 2, 3, 5, 8]</p>
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+<p class="text-[10px] text-slate-500">Execution time: 0.12ms</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Meta -->
+<footer class="max-w-[1600px] mx-auto w-full px-6 py-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 mt-auto text-slate-500 text-xs">
+<p>© 2024 DSA Vision Algorithm Visualizer</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-primary" href="#">Docs</a>
+<a class="hover:text-primary" href="#">API</a>
+<a class="hover:text-primary" href="#">Support</a>
+</div>
+</footer>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+
+    function openSidebar(section) {
+        const topicsContent = document.getElementById('sidebar-content-topics');
+        const libraryContent = document.getElementById('sidebar-content-library');
+        const title = document.getElementById('sidebar-title');
+        const icon = document.getElementById('sidebar-title-icon');
+
+        if (section === 'topics') {
+            topicsContent.classList.remove('hidden');
+            libraryContent.classList.add('hidden');
+            title.innerText = 'Topics';
+            icon.innerText = 'category';
+        } else {
+            topicsContent.classList.add('hidden');
+            libraryContent.classList.remove('hidden');
+            title.innerText = 'Library';
+            icon.innerText = 'local_library';
+        }
+
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (!sidebar.classList.contains('open')) {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        }
+    }
+</script>
+</body></html>
